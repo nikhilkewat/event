@@ -1,10 +1,10 @@
 import { Palette } from 'lucide-react';
 import ModuleRenderer from './ModuleRenderer';
-import type { Event } from '../types/event.types';
+import type { Event, LinkItem } from '../types/event.types';
 
 interface EventFormProps {
     eventData: Event;
-    photos: string[];
+     photos: LinkItem[];
     backgroundImage: string;
     onChange?: (field: string, value: string) => void;
     onSaveDraft?: () => void;

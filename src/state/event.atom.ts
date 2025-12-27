@@ -13,8 +13,8 @@ export const eventAtom = atom<Event>({
         cost_per_person: 0,
         description: '',
         capacity: null,
-        photo_gallery: [],
-        links: [],
+       photo_gallery: [{ id: crypto.randomUUID(), value: '' }],
+    links: [{ id: crypto.randomUUID(), value: '' }],
         modules: [],
         background_style: {
             type: 'gradient',
