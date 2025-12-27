@@ -4,32 +4,34 @@ import EventForm from './components/EventForm';
 
 import { useEventService } from './services/event.services';
 import type { Event } from './types/event.types';
+import BackgroundPicker from './components/BackgroundPicker';
 
 
 
 function App() {
-  //const { event} = useEventService()
+  const { event,updateBackground, updateEventField } = useEventService()
 
-  const [event, setEvent] = useState<Event>({
-    name: '',
-    phone_number: '',
-    date_time: '',
-    location: '',
-    cost_per_person: 0,
-    description: '',
-    capacity: null,
-    photo_gallery: [],
-    links: [],
-    modules: [],
-    background_style: {
-      type: 'gradient',
-      value: 'from-[#1B2A29] via-[#AC6887]  to-[#1C2929]',
-    }
-  });
+  // const [event, setEvent] = useState<Event>({
+  //   name: '',
+  //   phone_number: '',
+  //   date_time: '',
+  //   location: '',
+  //   cost_per_person: 0,
+  //   description: '',
+  //   capacity: null,
+  //   photo_gallery: [],
+  //   links: [],
+  //   modules: [],
+  //   background_style: {
+  //     type: 'gradient',
+  //     value: 'from-[#1B2A29] via-[#AC6887]  to-[#1C2929]',
+  //   }
+  // });
 
   const [backgroundImage, setBackgroundImage] = useState('');
 
   const [showBackgroundPicker, setShowBackgroundPicker] = useState({ show: false, type: 'inviationCard' as 'inviationCard' | 'background' });
+
   const [showCustomize, setShowCustomize] = useState(false);
 
   const [notification, setNotification] = useState<{
@@ -37,6 +39,13 @@ function App() {
     type: 'success' | 'error';
   } | null>(null);
 
+  const handleChange = (field: string, value: string) => {
+    updateEventField(field, value);
+  };
+
+  const handleUploadBackground = (url: string) => {
+    setBackgroundImage(url);
+  };
 
 
   return (
@@ -52,10 +61,10 @@ function App() {
           <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
             <div className="">
               <InvitationCard
-                backgroundStyle={event?.background_style!!}
+                backgroundStyle={event?.flyer_style!!}
                 type={'inviationCard'}
-                onChangeBackground={() => { }}
-                onChangeBackgroundImage={() => { }}
+                onChangeBackground={() => setShowBackgroundPicker({ show: true, type: 'inviationCard' })}
+                onChangeBackgroundImage={() => setShowBackgroundPicker({ show: true, type: 'background' })}
               />
             </div>
 
@@ -64,7 +73,8 @@ function App() {
                 eventData={event}
                 photos={event.photo_gallery || []}
                 backgroundImage={backgroundImage}
-
+                onChange={handleChange}
+                onUploadBackground={handleUploadBackground}
               />
             </div>
           </div>
@@ -75,6 +85,7 @@ function App() {
         isOpen={showBackgroundPicker.show}
         onClose={() => setShowBackgroundPicker({ show: false, type: 'background' })}
         onSelect={(onselectedStyle) => {
+          console.log("Selected Style:", onselectedStyle,showBackgroundPicker);
           if (showBackgroundPicker.type === 'background') {
             updateBackground('flyer_style', onselectedStyle);
             // setBackgroundStyleFlyer(onselectedStyle);
