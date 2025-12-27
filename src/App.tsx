@@ -3,27 +3,27 @@ import InvitationCard from './components/InvitationCard';
 import EventForm from './components/EventForm';
 
 import { useEventService } from './services/event.services';
+import type { Event } from './types/event.types';
 
 
 
 function App() {
   //const { event} = useEventService()
 
-  const [event,setEvent] = useState<Event>({
-
+  const [event, setEvent] = useState<Event>({
     name: '',
     phone_number: '',
     date_time: '',
     location: '',
     cost_per_person: 0,
-    description: '',    
-    capacity: null,    
-    photo_gallery: [],    
-    links: [],    
-    modules: [],    
+    description: '',
+    capacity: null,
+    photo_gallery: [],
+    links: [],
+    modules: [],
     background_style: {
-        type: 'gradient',
-        value: 'from-[#1B2A29] via-[#AC6887]  to-[#1C2929]',
+      type: 'gradient',
+      value: 'from-[#1B2A29] via-[#AC6887]  to-[#1C2929]',
     }
   });
 
@@ -37,7 +37,7 @@ function App() {
     type: 'success' | 'error';
   } | null>(null);
 
- 
+
 
   return (
     <div className={`min-h-screen bg-linear-to-br ${event?.background_style?.value} relative overflow-hidden`}>
@@ -52,10 +52,10 @@ function App() {
           <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
             <div className="">
               <InvitationCard
-                backgroundStyle={event?.flyer_style!!}
+                backgroundStyle={event?.background_style!!}
                 type={'inviationCard'}
-                onChangeBackground={() => {}}
-                onChangeBackgroundImage={() => {}}
+                onChangeBackground={() => { }}
+                onChangeBackgroundImage={() => { }}
               />
             </div>
 
@@ -64,13 +64,26 @@ function App() {
                 eventData={event}
                 photos={event.photo_gallery || []}
                 backgroundImage={backgroundImage}
-               
+
               />
             </div>
           </div>
         </div>
       </div>
 
+      <BackgroundPicker
+        isOpen={showBackgroundPicker.show}
+        onClose={() => setShowBackgroundPicker({ show: false, type: 'background' })}
+        onSelect={(onselectedStyle) => {
+          if (showBackgroundPicker.type === 'background') {
+            updateBackground('flyer_style', onselectedStyle);
+            // setBackgroundStyleFlyer(onselectedStyle);
+          } else {
+            updateBackground('background_style', onselectedStyle);
+          }
+        }}
+        currentStyle={event?.background_style ?? event?.background_style!!}
+      />
 
       {notification && (
         <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
