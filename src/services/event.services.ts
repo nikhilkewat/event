@@ -1,8 +1,8 @@
 
-import { useRecoilState } from 'recoil';
+import { useRecoilCallback, useRecoilState } from 'recoil';
 import { eventAtom } from '../state/event.atom';
 import { mockEventApi } from '../api/event.api';
-import type { EventModuleType, LinkItem } from '../types/event.types';
+import type { Event, EventModuleType, LinkItem } from '../types/event.types';
 
 
 export const useEventService = () => {
@@ -62,6 +62,22 @@ export const useEventService = () => {
             modules: [...(prev.modules ?? []), { type }]
         }));
     };
+
+    const createEvent = useRecoilCallback(({ set }) => async (postData: Event) => {
+        try {
+            const response = await mockEventApi.createEvent(postData);
+            if (!response) {
+                throw new Error('Network response was not ok');
+            }
+            const newPost = response
+            set(eventAtom, newPost);
+            return newPost;
+        } catch (error) {
+            console.error("Error creating post:", error);
+            // Handle the error, possibly by setting an error state atom
+            throw error;
+        }
+    }, []);
     return {
         event,
         updateEventField,
@@ -70,7 +86,8 @@ export const useEventService = () => {
         removeRow,
         updateRowValue,
         uploadFlyer,
-        addModule
+        addModule,
+        createEvent
     }
 }
 

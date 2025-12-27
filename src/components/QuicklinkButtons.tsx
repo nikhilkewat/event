@@ -1,8 +1,6 @@
-import { Palette } from "lucide-react";
-import type { EventModuleType, QuickLink } from "../types/event.types";
+
+import type { QuickLink } from "../types/event.types";
 import { useState } from "react";
-import {useRecoilValue} from 'recoil'
-import { eventAtom } from "../state/event.atom";
 import { useEventService } from "../services/event.services";
 
 
@@ -18,15 +16,15 @@ const ALL_MODULES: QuickLink[] = [
 ];
 
 export default function QuickLinkButtons() {
-    const { event,addModule } = useEventService();
-   // console.log(useRecoilValue(eventAtom));
+    const { event, addModule } = useEventService();
+    // console.log(useRecoilValue(eventAtom));
     // console.log(event);
     const [showAll, setShowAll] = useState<boolean>(false);
 
-    
+
     const addedTypes = event?.modules?.map(m => m.type);
 
-     const availableModules = ALL_MODULES.filter(m => !addedTypes?.includes(m.type));
+    const availableModules = ALL_MODULES.filter(m => !addedTypes?.includes(m.type));
 
 
 
@@ -36,7 +34,7 @@ export default function QuickLinkButtons() {
         ? availableModules
         : availableModules.slice(0, VISIBLE_COUNT);
 
-    
+
 
     return (
         <div className="max-w-2xl">
@@ -44,7 +42,7 @@ export default function QuickLinkButtons() {
                 {visibleModules.map(({ type, label }) => (
                     <button
                         key={type}
-                       onClick={() => addModule(type)}
+                        onClick={() => addModule(type)}
                         className="flex items-center gap-1 border border-gray-200 px-3 py-1.5 rounded-full text-sm  bg-gray-200 hover:bg-gray-100"
                     >
                         <span className="text-lg leading-none">+</span>

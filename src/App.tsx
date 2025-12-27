@@ -9,7 +9,7 @@ import BackgroundPicker from './components/BackgroundPicker';
 
 
 function App() {
-  const { event,updateBackground, updateEventField } = useEventService()
+  const { event, updateBackground, updateEventField,createEvent } = useEventService()
 
   // const [event, setEvent] = useState<Event>({
   //   name: '',
@@ -32,7 +32,6 @@ function App() {
 
   const [showBackgroundPicker, setShowBackgroundPicker] = useState({ show: false, type: 'inviationCard' as 'inviationCard' | 'background' });
 
-  const [showCustomize, setShowCustomize] = useState(false);
 
   const [notification, setNotification] = useState<{
     message: string;
@@ -46,8 +45,64 @@ function App() {
   const handleUploadBackground = (url: string) => {
     setBackgroundImage(url);
   };
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') + '-' + Math.random().toString(36).substring(2, 8);
+  };
+  const handleSaveDraft = async () => {
+    if (!event.phone_number) {
+      showNotification('Please enter a phone number to save the draft', 'error');
+      return;
+    }
 
 
+    try {
+      const eventPayload: Event = {
+        ...event,
+        is_published: false,
+        slug: generateSlug(event.name || 'event'),
+      };
+
+      await createEvent(eventPayload);
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      showNotification('Failed to save draft. Please try again.', 'error');
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!event.phone_number) {
+      showNotification('Please enter a phone number before publishing', 'error');
+      return;
+    }
+
+    if (!event.name) {
+      showNotification('Please enter an event name before publishing', 'error');
+      return;
+    }
+
+    try {
+      const eventPayload = {
+        ...event,
+        is_published: true,
+        slug: generateSlug(event.name),
+      };
+
+      createEvent(eventPayload as Event);
+      alert(JSON.stringify(event));
+      showNotification('Event published successfully!', 'success');
+    } catch (error) {
+      console.error('Error publishing event:', error);
+      showNotification('Failed to publish event. Please try again.', 'error');
+    }
+  };
+
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };  
   return (
     <div className={`min-h-screen bg-linear-to-br ${event?.background_style?.value} relative overflow-hidden`}>
       <div className={`absolute inset-0 bg-linear-to-br ${event?.background_style?.value} backdrop-blur-3xl`}></div>
@@ -75,6 +130,9 @@ function App() {
                 backgroundImage={backgroundImage}
                 onChange={handleChange}
                 onUploadBackground={handleUploadBackground}
+                onSaveDraft={handleSaveDraft}
+                onPublish={handlePublish}
+
               />
             </div>
           </div>
@@ -85,7 +143,7 @@ function App() {
         isOpen={showBackgroundPicker.show}
         onClose={() => setShowBackgroundPicker({ show: false, type: 'background' })}
         onSelect={(onselectedStyle) => {
-          console.log("Selected Style:", onselectedStyle,showBackgroundPicker);
+          console.log("Selected Style:", onselectedStyle, showBackgroundPicker);
           if (showBackgroundPicker.type === 'background') {
             updateBackground('flyer_style', onselectedStyle);
             // setBackgroundStyleFlyer(onselectedStyle);
